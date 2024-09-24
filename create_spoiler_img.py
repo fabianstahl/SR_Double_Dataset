@@ -29,7 +29,7 @@ s2_imgs     = [(np.clip(img, 0, 2000) / 2000 * 255).astype(np.uint8) for img in 
 dop_imgs    = [cv2.resize(img, (new_size, new_size)) for img in dop_imgs]
 s2_imgs     = [cv2.resize(img, (new_size, new_size)) for img in s2_imgs]
 
-# Combinee them
+# Combine them
 dop_imgs    = np.hstack(dop_imgs)
 s2_imgs     = np.hstack(s2_imgs)
 plot        = np.vstack([dop_imgs, s2_imgs])
