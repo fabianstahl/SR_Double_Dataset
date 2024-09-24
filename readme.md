@@ -1,6 +1,6 @@
 # Overview
-This repository helps creating a dataset intended for **super resolution** on landscape images. The region
-It consists of two sources:
+This repository helps to create a dataset intended for **super resolution** on landscape images. The area of interest covers the German state of Hessia.
+The dataset consists of image pairs, respectively with a High Resolution (HR) and a Low Resolution (LR) version, both covering the same area:
 
 - **DOP-20 Images**: Digital Ortho-Photos with a 20 cm resolution covering the state of Hessia, provided by the [HVBG](https://hvbg.hessen.de/) (Hessische Verwaltung für Bodenmanagement und Geoinformation )
 - **S2 Images**: 13-band frequency data from the Sentinel 2 satellite with a 10 meter resolution, provided via the Earth Engine API
