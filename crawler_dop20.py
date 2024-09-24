@@ -1,24 +1,25 @@
 import configparser
-from selenium import webdriver
-from bs4 import BeautifulSoup
-import tqdm
-import requests, zipfile, io
 import json
 import os
+import requests, zipfile, io
+import shutil
+import tqdm
+from selenium import webdriver
+from bs4 import BeautifulSoup
 
-URL_ROOT            = "https://gds.hessen.de/"
 
 class Crawler():
 
     def __init__(self, configs):
         self.configs        = configs
 
-        self.buffer_path    = self.configs.get('RegionMetaDataBuffer')
+        self.buffer_path    = self.configs.get('DownloadLinkBuffer')
         self.download_dir   = self.configs.get('DownloadDirectory')
+
 
     def fetch_download_links(self):
         if os.path.exists(self.buffer_path):
-            print("Found an existing metadata buffer under '{}' -> Skipping fetching regions".format(self.buffer_path))
+            print("Found an existing download list under '{}' -> Skipping".format(self.buffer_path))
         else:
             results = self.fetch_regions()
             with open(self.buffer_path, 'w') as f:
@@ -52,7 +53,7 @@ class Crawler():
 
 
     def fetch_municipalities(self, region):
-        metadata            = {}
+        data                = {}
         page_no             = 1
         retries             = 0
         reached_last_page   = False
@@ -83,15 +84,15 @@ class Crawler():
                 reached_last_page   = True
 
             for elem in data_element:
-                town            = elem.find("h2").get_text().replace('- DOP20\n', '').lstrip().strip()
-                link            = configs.get('BaseURL') + elem.find("a").get('href').replace(' ', '%20')
-                metadata[town]  = link
+                town        = elem.find("h2").get_text().replace('- DOP20\n', '').lstrip().strip()
+                link        = configs.get('BaseURL') + elem.find("a").get('href').replace(' ', '%20')
+                data[town]  = link
 
             if reached_last_page:
                 break
 
         # Dict Format: {'municipality': 'municipality_url' }
-        return metadata
+        return data
 
 
     def download_municipality(self, region, mun, link):
@@ -126,14 +127,25 @@ class Crawler():
             os.makedirs(dataset_dir)
 
         download_dir    = self.configs.get('DownloadDirectory')
-        for region in os.path.listdir(download_dir):
+        for region in tqdm.tqdm(os.listdir(download_dir)):
             region_path = os.path.join(download_dir, region)
-            for mun in os.path.listdir(region_path):
+            for mun in os.listdir(region_path):
                 mun_path = os.path.join(region_path, mun)
                 for file in os.listdir(mun_path):
-                    if file.endswith('.jpg'):
+                    if file.endswith('.jpg') and not os.path.exists(os.path.join(dataset_dir, file)):
                         file_path = os.path.join(mun_path, file)
                         shutil.copy(file_path, dataset_dir)
+
+
+    def download_metadata_file(self):
+        url_metadata    = self.configs.get('URLMetaData')
+        file_name       = self.configs.get('MetaDataFileName')
+        if not os.path.exists(file_name):
+            response = requests.get(url_metadata)
+            with open(file_name, 'wb') as file:
+                file.write(response.content)
+        else:
+            print("Found an existing metadata file under '{}' -> Skipping Download".format(file_name))
 
 
 if __name__ == "__main__":
@@ -144,12 +156,16 @@ if __name__ == "__main__":
 
     crawler = Crawler(configs)
 
-    print("\n== Stage 1/3:\tFetching Regions and their respective Municipality Download Links ==")
+    print("\n== Stage 1/4:\tFetching Regions and their respective Municipality Download Links ==")
     crawler.fetch_download_links()
 
-    print("\n== Stage 2/3:\tDownloading Data ==")
+    print("\n== Stage 2/4:\tDownloading Data ==")
     crawler.download_data()
 
-    print("\n== Stage 3/3:\tAggregate Data ==")
+    print("\n== Stage 3/4:\tAggregating Data ==")
     crawler.aggregate_data()
-    #c.start()
+
+    print("\n== Stage 4/4:\tDownloading Metadata File ==")
+    crawler.download_metadata_file()
+
+    print("\n== Done! ==")
