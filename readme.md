@@ -5,6 +5,8 @@ It consists of two sources:
 - **DOP-20 Images**: Digital Ortho-Photos with a 20 cm resolution covering the state of Hessia, provided by the [HVBG](https://hvbg.hessen.de/) (Hessische Verwaltung für Bodenmanagement und Geoinformation )
 - **S2 Images**: 13-band frequency data from the Sentinel 2 satellite with a 10 meter resolution, provided via the Earth Engine API
 
+This plot shows a row of DOP-20 images and their according S2 images below (for visualization only RGB bands).
+![image missing](spoiler.png "Sample Data")
 
 # Prerequisites
 Install all dependencies using the following command:
