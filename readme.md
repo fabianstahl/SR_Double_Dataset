@@ -43,11 +43,11 @@ python crawler_s2.py
 Again, crawling is split into several stages:
 - Stage 1: Earth Engine Authentication
 - Stage 2: Parsing the DOP-20 metadata file to get acquisition dates
-- Stage 3: Download matching S2 tiles, by default to *dataset_s2*
+- Stage 3: Download matching S2 tiles, by default to *dataset_s2/*
 
 
 # 3) Clean Up Data
-Finally, the following script can be used to clean up date data to ensure uncorrupted HR-LR pairs.
+Finally, the following script can be used to clean up the data to ensure uncorrupted HR-LR pairs.
 Faulty data is moved to a folder, per default *excluded/*
 ```bash
 python clean_up.py
