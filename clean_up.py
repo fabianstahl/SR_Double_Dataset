@@ -26,7 +26,7 @@ class Cleaner:
             file_path = os.path.join(dop_data_dir, file)
             if not file_path in ref_file_to_date:
                 print("Stage 1: File '{}' has no acquisition date!".format(file))
-                #shutil.move(file_path, excl_dir)
+                shutil.move(file_path, excl_dir)
 
 
     def exclude_currupted(self):
@@ -64,7 +64,7 @@ class Cleaner:
         # 1) Number of samples
         dop_root    = self.configs['S2'].get('ReferenceDatasetDirectory')
         s2_root     = self.configs['S2'].get('DatasetDirectory')
-        #assert len(os.listdir(dop_root)) == len(os.listdir(s2_root))
+        assert len(os.listdir(dop_root)) == len(os.listdir(s2_root))
         print("Number of HR-LR pairs:\n\t'{}'".format(len(os.listdir(dop_root))))
 
         # 2) Date Range
