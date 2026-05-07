@@ -102,11 +102,16 @@ class Crawler():
         else:
             print("Found region '{}': municipality '{}' -> Skipping".format(region, mun))
             return
-
-        r = requests.get(link)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        z.extractall(full_path)
-
+        try:
+            r = requests.get(link)
+            z = zipfile.ZipFile(io.BytesIO(r.content))
+            z.extractall(full_path)
+        except Exception as e:
+            print(e)
+            print("Retrying.")
+            print(link)
+            os.rmdir(full_path)
+            self.download_municipality(region, mun, link)
 
     def download_data(self):
 
@@ -134,7 +139,9 @@ class Crawler():
                 for file in os.listdir(mun_path):
                     if file.endswith('.jpg') and not os.path.exists(os.path.join(dataset_dir, file)):
                         file_path = os.path.join(mun_path, file)
-                        shutil.copy(file_path, dataset_dir)
+                        parts = file.split("_")
+                        output_path = f"DOP20_{parts[1]}_{parts[2]}_{parts[3]}_{parts[4]}_he.jpg"
+                        shutil.copy(file_path, os.path.join(dataset_dir, output_path))
 
 
     def download_metadata_file(self):
